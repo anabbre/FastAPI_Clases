@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse  
 from pydantic import BaseModel, Field #BaseModel para crear el esquema de datos, Field para validar
 from typing import List #para declarar listas de profesores
 import logging #para mostrar mensajes por consola 
@@ -11,6 +12,14 @@ logging.basicConfig(
 logger = logging.getLogger(__name__) #creamos el logger con el nombre del archivo 
 
 app = FastAPI()
+
+# Función para manejar los errores ValueError
+@app.exception_handler(ValueError)
+async def value_error_handler(request: Request, exc: ValueError):
+    return JSONResponse(
+        status_code=400,
+        content={"detail": str(exc)}  # Mostramos el mensaje de error
+    )
 
 #Mostrar la información cada vez que llega una petición
 @app.middleware("http")
